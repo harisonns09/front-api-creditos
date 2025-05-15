@@ -1,0 +1,10 @@
+/* No styles: [] ou em um .css/.scss separado */
+.btn-primario {
+  grid-column: span 2;
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

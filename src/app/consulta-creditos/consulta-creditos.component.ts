@@ -15,11 +15,11 @@ import { CommonModule } from '@angular/common';
         <input type="text" formControlName="numeroNfse" placeholder="Número da NFS-e" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;" />
         <input type="text" formControlName="numeroCredito" placeholder="Número do Crédito" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;" />
 
-        <div *ngIf="form.errors?.['apenasUmObrigatorio']" style="color: red; grid-column: span 2;">
-        Por favor, preencha <strong>somente um</strong> dos campos.
-      </div>
+        <div *ngIf="form.errors?.['apenasUmObrigatorio'] && (form.dirty || form.touched)" style="color: red; grid-column: span 2;">
+          Por favor, preencha <strong>somente um</strong> dos campos.
+        </div>
 
-        <button type="submit" [disabled]="form.invalid || carregando" style="grid-column: span 2; background-color: #007bff; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
+        <button class="btn-primario" type="submit" [disabled]="form.invalid || carregando" style="grid-column: span 2; background-color: #007bff; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
           {{ carregando ? 'Buscando...' : 'Buscar' }}
         </button>
       </form>
@@ -27,6 +27,8 @@ import { CommonModule } from '@angular/common';
       <div *ngIf="!carregando && creditos.length === 0 && resultadoVazio" style="margin-top: 20px; color: red; text-align: center;">
         Nenhum resultado encontrado.
       </div>
+
+      <br/>
       
       <div *ngIf="creditos.length > 0" class="mt-6">
         <table class="table table-striped table-bordered table-hover table-responsive-sm">
