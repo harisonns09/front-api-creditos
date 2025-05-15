@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-consulta-creditos',
@@ -10,6 +11,10 @@ import { CommonModule } from '@angular/common';
   template: `
     <div class="container">
       <h1 class="title">Consulta de Créditos</h1>
+
+      <button (click)="voltar()" style="margin-bottom: 20px; background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+        ← Voltar
+      </button>
 
       <form [formGroup]="form" (ngSubmit)="buscar()" class="form">
         <input type="text" formControlName="numeroNfse" placeholder="Número da NFS-e" class="input" />
@@ -61,6 +66,7 @@ import { CommonModule } from '@angular/common';
         </table>
       </div>
     </div>
+
   `,
   styles: [`
     .container {
@@ -168,7 +174,11 @@ export class ConsultaCreditosComponent implements OnInit {
   carregando = false;
   resultadoVazio = false;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.form = this.fb.group(
       {
         numeroNfse: [''],
@@ -221,6 +231,10 @@ export class ConsultaCreditosComponent implements OnInit {
         complete: () => this.carregando = false
       });
     }
+  }
+
+  voltar() {
+    this.router.navigate(['/']);
   }
 
 
