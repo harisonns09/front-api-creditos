@@ -1,0 +1,52 @@
+<div class="form-container">
+  <h2>Incluir Crédito</h2>
+
+  <form [formGroup]="form" (ngSubmit)="incluir()">
+    <!-- Etapa 1 -->
+    <ng-container *ngIf="step === 1">
+      <div class="form-group">
+        <label for="dataConstituicao">Data de Constituição</label>
+        <input id="dataConstituicao" type="date" formControlName="dataConstituicao" />
+        <small *ngIf="campoInvalido('dataConstituicao')">Campo obrigatório</small>
+      </div>
+    </ng-container>
+
+    <!-- Etapa 2 -->
+    <ng-container *ngIf="step === 2">
+      <div class="form-group">
+        <label for="aliquota">Alíquota (%)</label>
+        <input id="aliquota" type="number" formControlName="aliquota" />
+        <small *ngIf="campoInvalido('aliquota')">Campo obrigatório</small>
+      </div>
+
+      <div class="form-group">
+        <label for="valorFaturado">Valor Faturado</label>
+        <input id="valorFaturado" formControlName="valorFaturado" />
+        <small *ngIf="campoInvalido('valorFaturado')">Campo obrigatório</small>
+      </div>
+
+      <div class="form-group">
+        <label for="valorDeducao">Valor Dedução</label>
+        <input id="valorDeducao" formControlName="valorDeducao" />
+        <small *ngIf="campoInvalido('valorDeducao')">Campo obrigatório</small>
+      </div>
+
+      <div class="form-group">
+        <label for="baseCalculo">Base de Cálculo</label>
+        <input id="baseCalculo" formControlName="baseCalculo" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="valorIssqn">Valor ISSQN</label>
+        <input id="valorIssqn" formControlName="valorIssqn" readonly />
+      </div>
+    </ng-container>
+
+    <!-- Botões -->
+    <div class="buttons">
+      <button type="button" (click)="prevStep()" *ngIf="step > 1">Voltar</button>
+      <button type="button" (click)="nextStep()" *ngIf="step < 2">Próximo</button>
+      <button type="submit" *ngIf="step === 2">Salvar</button>
+    </div>
+  </form>
+</div>

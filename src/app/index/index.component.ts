@@ -10,7 +10,11 @@ import { RouterModule } from '@angular/router';
     <div class="container">
       <h1 class="title">Sistema de Consulta</h1>
       <p class="subtitle">Acesse informações de créditos vinculados à NFS-e de forma simples e rápida.</p>
-      <a routerLink="/consulta" class="btn">Consultar Créditos</a>
+      
+      <div class="button-row">
+        <a routerLink="/consulta" class="btn blue">🔍 Consultar Créditos</a>
+        <a routerLink="/incluir" class="btn green">➕ Incluir Crédito</a>
+      </div>
     </div>
   `,
   styles: [`
@@ -45,6 +49,13 @@ import { RouterModule } from '@angular/router';
       border-radius: 8px;
       text-decoration: none;
       transition: background-color 0.3s ease;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px; /* Espaçamento menor entre os botões */
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     .btn:hover {

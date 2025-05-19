@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { CreditoService } from '../services/credito.service';
 
 @Component({
   selector: 'app-consulta-creditos',
@@ -12,9 +13,8 @@ import { Router } from '@angular/router';
     <div class="container">
       <h1 class="title">Consulta de Créditos</h1>
 
-      <button (click)="voltar()" style="margin-bottom: 20px; background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
-        ← Voltar
-      </button>
+      <button (click)="voltar()" class="btn-voltar">← Voltar</button>
+      <button (click)="listarTodos()" class="btn-listar">Listar todos os créditos</button>
 
       <form [formGroup]="form" (ngSubmit)="buscar()" class="form">
         <input type="text" formControlName="numeroNfse" placeholder="Número da NFS-e" class="input" />
@@ -37,6 +37,7 @@ import { Router } from '@angular/router';
         <table class="tabela">
           <thead>
             <tr>
+              <th></th> <!-- coluna para o radio -->
               <th>Número Crédito</th>
               <th>Número NFS-e</th>
               <th>Data Constituição</th>
@@ -47,26 +48,34 @@ import { Router } from '@angular/router';
               <th>Valor Faturado</th>
               <th>Valor Dedução</th>
               <th>Base de Cálculo</th>
+              <th>Ações</th> <!-- nova coluna -->
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let c of creditos">
+            <tr *ngFor="let c of creditos" [class.selecionado]="creditoSelecionado?.numeroCredito === c.numeroCredito">
+              <td>
+                <input type="radio" name="creditoSelecionado" [value]="c" (change)="selecionarCredito(c)" />
+              </td>
               <td>{{ c.numeroCredito }}</td>
               <td>{{ c.numeroNfse }}</td>
               <td>{{ c.dataConstituicao }}</td>
               <td>R$ {{ c.valorIssqn | number:'1.2-2' }}</td>
               <td>{{ c.tipoCredito }}</td>
-              <td>{{ c.simplesNacional }}</td>
+              <td>{{ c.simplesNacional === true || c.simplesNacional === 'true' ? 'Sim' : 'Não' }}</td>
               <td>{{ c.aliquota | number:'1.2-2' }}%</td>
               <td>R$ {{ c.valorFaturado | number:'1.2-2' }}</td>
               <td>R$ {{ c.valorDeducao | number:'1.2-2' }}</td>
               <td>R$ {{ c.baseCalculo | number:'1.2-2' }}</td>
+              <td>
+                <button (click)="excluirCredito(c.numeroCredito)" class="btn-excluir">
+                  Excluir
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-
   `,
   styles: [`
     .container {
@@ -111,7 +120,6 @@ import { Router } from '@angular/router';
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.2s ease-in-out;
     }
 
     .btn:hover {
@@ -121,6 +129,26 @@ import { Router } from '@angular/router';
     .btn:disabled {
       background-color: #ccc;
       cursor: not-allowed;
+    }
+
+    .btn-voltar,
+    .btn-listar {
+      margin: 0 10px 20px 0;
+      background-color: #6c757d;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-excluir {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
     .resultado-vazio {
@@ -148,6 +176,11 @@ import { Router } from '@angular/router';
       text-align: center;
     }
 
+    .selecionado {
+      background-color: #e9f7ff;
+      font-weight: bold;
+    } 
+
     .tabela thead {
       background-color: #343a40;
       color: white;
@@ -173,10 +206,12 @@ export class ConsultaCreditosComponent implements OnInit {
   creditos: any[] = [];
   carregando = false;
   resultadoVazio = false;
+  creditoSelecionado: any = null;
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
+    private creditoService: CreditoService,
     private router: Router
   ) {
     this.form = this.fb.group(
@@ -196,7 +231,6 @@ export class ConsultaCreditosComponent implements OnInit {
     return (group: FormGroup) => {
       const nfse = group.get('numeroNfse')?.value?.trim();
       const credito = group.get('numeroCredito')?.value?.trim();
-
       if ((nfse && credito) || (!nfse && !credito)) {
         return { apenasUmObrigatorio: true };
       }
@@ -208,12 +242,10 @@ export class ConsultaCreditosComponent implements OnInit {
     if (this.form.invalid) return;
 
     const { numeroNfse, numeroCredito } = this.form.value;
-    this.creditos = [];
-    this.resultadoVazio = false;
-    this.carregando = true;
+    this.iniciarBusca();
 
     if (numeroCredito) {
-      this.http.get<any>(`http://localhost:8080/api/creditos/credito/${numeroCredito}`).subscribe({
+      this.creditoService.buscarPorNumeroCredito(numeroCredito).subscribe({
         next: (c) => {
           this.creditos = c ? [c] : [];
           this.resultadoVazio = !c;
@@ -221,8 +253,8 @@ export class ConsultaCreditosComponent implements OnInit {
         error: () => this.resultadoVazio = true,
         complete: () => this.carregando = false
       });
-    } else if (numeroNfse) {
-      this.http.get<any[]>(`http://localhost:8080/api/creditos/${numeroNfse}`).subscribe({
+    } else {
+      this.creditoService.buscarPorNumeroNfse(numeroNfse).subscribe({
         next: (cs) => {
           this.creditos = cs;
           this.resultadoVazio = cs.length === 0;
@@ -233,9 +265,44 @@ export class ConsultaCreditosComponent implements OnInit {
     }
   }
 
+  listarTodos(): void {
+    this.iniciarBusca();
+    this.creditoService.listarTodos().subscribe({
+      next: (cs) => {
+        this.creditos = cs;
+        this.resultadoVazio = cs.length === 0;
+      },
+      error: () => this.resultadoVazio = true,
+      complete: () => this.carregando = false
+    });
+  }
+
+  excluirCredito(numeroCredito: string): void {
+    if (confirm(`Tem certeza que deseja excluir o crédito nº ${numeroCredito}?`)) {
+      this.creditoService.deletarPorNumeroCredito(numeroCredito).subscribe({
+        next: (mensagem) => {
+          alert(mensagem);
+          this.creditos = this.creditos.filter(c => c.numeroCredito !== numeroCredito);
+          if (this.creditos.length === 0) this.resultadoVazio = true;
+        },
+        error: (erro) => {
+          alert(`Erro ao excluir crédito: ${erro.error || 'Tente novamente mais tarde.'}`);
+        }
+      });
+    }
+  }
+
+  private iniciarBusca(): void {
+    this.creditos = [];
+    this.resultadoVazio = false;
+    this.carregando = true;
+  }
+
+  selecionarCredito(credito: any): void {
+    this.creditoSelecionado = credito;
+  }
+
   voltar() {
     this.router.navigate(['/']);
   }
-
-
 }
