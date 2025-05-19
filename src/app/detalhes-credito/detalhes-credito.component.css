@@ -1,0 +1,25 @@
+.detalhes-cartao {
+  background: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 25px;
+  margin-top: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.linha {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.label {
+  font-weight: 600;
+  color: #555;
+}
+
+.valor {
+  font-weight: 500;
+  color: #333;
+}

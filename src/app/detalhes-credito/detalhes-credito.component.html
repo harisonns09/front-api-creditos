@@ -1,0 +1,54 @@
+<div class="container">
+  <h1 class="title">Detalhes do Crédito</h1>
+
+  <button class="btn-voltar" (click)="voltar()">← Voltar</button>
+
+  <ng-container *ngIf="credito as c; else carregando">
+    <div class="detalhes-cartao">
+      <div class="linha">
+        <span class="label">Número do Crédito:</span>
+        <span class="valor">{{ c.numeroCredito }}</span>
+      </div>
+      <div class="linha">
+        <span class="label">Número da NFS-e:</span>
+        <span class="valor">{{ c.numeroNfse }}</span>
+      </div>
+      <div class="linha">
+        <span class="label">Data de Constituição:</span>
+        <span class="valor">{{ c.dataConstituicao }}</span>
+      </div>
+      <div class="linha">
+        <span class="label">Valor ISSQN:</span>
+        <span class="valor">R$ {{ c?.valorIssqn | number:'1.2-2' }}</span>
+      </div>
+      <div class="linha">
+        <span class="label">Tipo de Crédito:</span>
+        <span class="valor">{{ c.tipoCredito }}</span>
+      </div>
+      <div class="linha">
+        <span class="label">Simples Nacional:</span>
+        <span class="valor">{{ c.simplesNacional === true || c.simplesNacional === 'true' ? 'Sim' : 'Não' }}</span>
+      </div>
+      <div class="linha">
+        <span class="label">Alíquota:</span>
+        <span class="valor">{{ +c.aliquota | number:'1.2-2' }}%</span>
+      </div>
+      <div class="linha">
+        <span class="label">Valor Faturado:</span>
+        <span class="valor">R$ {{ +c.valorFaturado | number:'1.2-2' }}</span>
+      </div>
+      <div class="linha">
+        <span class="label">Valor Dedução:</span>
+        <span class="valor">R$ {{ c.valorDeducao | number:'1.2-2' }}</span>
+      </div>
+      <div class="linha">
+        <span class="label">Base de Cálculo:</span>
+        <span class="valor">R$ {{ c.baseCalculo | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </ng-container> 
+
+  <ng-template #carregando>
+    <p>Carregando crédito...</p>
+  </ng-template>
+</div>

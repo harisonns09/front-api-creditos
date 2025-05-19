@@ -1,6 +1,106 @@
-<p>consulta-creditos works!</p>
+<div class="container">
+  <h1 class="title">Consulta de Créditos</h1>
 
-<!-- Botão de voltar -->
-<button (click)="voltar()" style="margin-bottom: 20px; background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
-  ← Voltar
-</button>
+
+  <div class="top-actions">
+    <button (click)="voltar()" class="btn-voltar">← Voltar</button>
+    <button (click)="listarTodos()" class="btn-listar">Listar todos os créditos</button>
+    <button class="btn-toggle-filtro" (click)="mostrarFiltro = !mostrarFiltro">
+      🔍 Filtrar por Valor Faturado
+      <span [innerText]="mostrarFiltro ? '▲' : '▼'"></span>
+    </button>
+  </div>
+
+    <div class="filtro-dropdown" *ngIf="mostrarFiltro">
+      <form [formGroup]="filtroForm" (ngSubmit)="filtrarPorValorFaturado()" class="filtro-form">
+        <div class="campo">
+          <label for="valorMin">Valor Mínimo</label>
+          <div class="input-wrapper">
+            <span class="icone">R$</span>
+            <input type="number" id="valorMin" formControlName="valorMin" placeholder="0.00" step="0.01" />
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="valorMax">Valor Máximo</label>
+          <div class="input-wrapper">
+            <span class="icone">R$</span>
+            <input type="number" id="valorMax" formControlName="valorMax" placeholder="0.00" step="0.01" />
+          </div>
+        </div>
+
+        <div class="acoes">
+          <button type="submit" class="btn-filtrar" [disabled]="filtroForm.invalid">Aplicar Filtro</button>
+          <button type="button" class="btn-limpar" (click)="limparFiltro()">Limpar</button>
+        </div>
+      </form>
+    </div>
+  
+
+
+  <form [formGroup]="form" (ngSubmit)="buscar()" class="form">
+    <input type="text" formControlName="numeroNfse" placeholder="Número da NFS-e" class="input" />
+    <input type="text" formControlName="numeroCredito" placeholder="Número do Crédito" class="input" />
+
+    <div *ngIf="form.errors?.['apenasUmObrigatorio'] && (form.dirty || form.touched)" class="form-error">
+      Por favor, preencha <strong>somente um</strong> dos campos.
+    </div>
+
+    <button type="submit" [disabled]="form.invalid || carregando" class="btn">
+      {{ carregando ? 'Buscando...' : 'Buscar' }}
+    </button>
+  </form>
+
+
+
+
+  <div *ngIf="!carregando && creditos.length === 0 && resultadoVazio" class="resultado-vazio">
+    Nenhum resultado encontrado.
+  </div>
+
+  <div *ngIf="creditos.length > 0" class="tabela-container">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th></th> <!-- coluna para o radio -->
+          <th>Número Crédito</th>
+          <th>Número NFS-e</th>
+          <th>Data Constituição</th>
+          <!-- <th>Valor ISSQN</th> -->
+          <!-- <th>Tipo Crédito</th> -->
+          <!-- <th>Simples Nacional</th> -->
+          <!-- <th>Alíquota</th> -->
+          <th>Valor Faturado</th>
+          <!-- <th>Valor Dedução</th> -->
+          <!-- <th>Base de Cálculo</th> -->
+          <th>Ações</th> <!-- nova coluna -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of creditos" [class.selecionado]="creditoSelecionado?.numeroCredito === c.numeroCredito">
+          <td>
+            <input type="radio" name="creditoSelecionado" [value]="c" (change)="selecionarCredito(c)" />
+          </td>
+          <td>{{ c.numeroCredito }}</td>
+          <td>{{ c.numeroNfse }}</td>
+          <td>{{ c.dataConstituicao }}</td>
+          <!-- <td>R$ {{ c.valorIssqn | number:'1.2-2' }}</td> -->
+          <!-- <td>{{ c.tipoCredito }}</td> -->
+          <!-- <td>{{ c.simplesNacional === true || c.simplesNacional === 'true' ? 'Sim' : 'Não' }}</td> -->
+          <!-- <td>{{ c.aliquota | number:'1.2-2' }}%</td> -->
+          <td>R$ {{ c.valorFaturado | number:'1.2-2' }}</td>
+          <!-- <td>R$ {{ c.valorDeducao | number:'1.2-2' }}</td> -->
+          <!-- <td>R$ {{ c.baseCalculo | number:'1.2-2' }}</td> -->
+          <td>
+            <button (click)="visualizarCredito(c.numeroCredito)" class="btn-visualizar">
+              Abrir
+            </button>
+            <button (click)="excluirCredito(c.numeroCredito)" class="btn-excluir">
+              Excluir
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
