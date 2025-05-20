@@ -34,4 +34,9 @@ export class CreditoService {
 
         return this.http.get<any[]>('http://localhost:8080/api/creditos/filtro', { params });
     }
+
+    imprimirNotaFiscal(numeroCredito: string): Observable<Blob> {
+        const url = `${this.baseUrl}/nota-fiscal/${numeroCredito}`;
+        return this.http.get(url, { responseType: 'blob' });
+    }
 }

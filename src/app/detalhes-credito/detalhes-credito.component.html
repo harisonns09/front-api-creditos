@@ -1,52 +1,32 @@
 <div class="container">
   <h1 class="title">Detalhes do Crédito</h1>
 
-  <button class="btn-voltar" (click)="voltar()">← Voltar</button>
+  <div class="acoes">
+    <button class="btn btn-voltar" (click)="voltar()">← Voltar</button>
+    <button class="btn btn-pdf" (click)="imprimirNotaFiscal(credito.numeroCredito)">
+      📄 Gerar Nota Fiscal (PDF)
+    </button>
+  </div>
 
   <ng-container *ngIf="credito as c; else carregando">
     <div class="detalhes-cartao">
-      <div class="linha">
-        <span class="label">Número do Crédito:</span>
-        <span class="valor">{{ c.numeroCredito }}</span>
-      </div>
-      <div class="linha">
-        <span class="label">Número da NFS-e:</span>
-        <span class="valor">{{ c.numeroNfse }}</span>
-      </div>
-      <div class="linha">
-        <span class="label">Data de Constituição:</span>
-        <span class="valor">{{ c.dataConstituicao }}</span>
-      </div>
-      <div class="linha">
-        <span class="label">Valor ISSQN:</span>
-        <span class="valor">R$ {{ c?.valorIssqn | number:'1.2-2' }}</span>
-      </div>
-      <div class="linha">
-        <span class="label">Tipo de Crédito:</span>
-        <span class="valor">{{ c.tipoCredito }}</span>
-      </div>
-      <div class="linha">
-        <span class="label">Simples Nacional:</span>
-        <span class="valor">{{ c.simplesNacional === true || c.simplesNacional === 'true' ? 'Sim' : 'Não' }}</span>
-      </div>
-      <div class="linha">
-        <span class="label">Alíquota:</span>
-        <span class="valor">{{ +c.aliquota | number:'1.2-2' }}%</span>
-      </div>
-      <div class="linha">
-        <span class="label">Valor Faturado:</span>
-        <span class="valor">R$ {{ +c.valorFaturado | number:'1.2-2' }}</span>
-      </div>
-      <div class="linha">
-        <span class="label">Valor Dedução:</span>
-        <span class="valor">R$ {{ c.valorDeducao | number:'1.2-2' }}</span>
-      </div>
-      <div class="linha">
-        <span class="label">Base de Cálculo:</span>
-        <span class="valor">R$ {{ c.baseCalculo | number:'1.2-2' }}</span>
+      <div class="linha" *ngFor="let item of [
+          { label: 'Número do Crédito', valor: c.numeroCredito },
+          { label: 'Número da NFS-e', valor: c.numeroNfse },
+          { label: 'Data de Constituição', valor: c.dataConstituicao },
+          { label: 'Valor ISSQN', valor: 'R$ ' + (c.valorIssqn | number:'1.2-2') },
+          { label: 'Tipo de Crédito', valor: c.tipoCredito },
+          { label: 'Simples Nacional', valor: c.simplesNacional === true || c.simplesNacional === 'true' ? 'Sim' : 'Não' },
+          { label: 'Alíquota', valor: (+c.aliquota | number:'1.2-2') + '%' },
+          { label: 'Valor Faturado', valor: 'R$ ' + (+c.valorFaturado | number:'1.2-2') },
+          { label: 'Valor Dedução', valor: 'R$ ' + (c.valorDeducao | number:'1.2-2') },
+          { label: 'Base de Cálculo', valor: 'R$ ' + (c.baseCalculo | number:'1.2-2') }
+        ]">
+        <span class="label">{{ item.label }}:</span>
+        <span class="valor">{{ item.valor }}</span>
       </div>
     </div>
-  </ng-container> 
+  </ng-container>
 
   <ng-template #carregando>
     <p>Carregando crédito...</p>
